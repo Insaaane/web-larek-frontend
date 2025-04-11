@@ -1,18 +1,23 @@
-export type TPayment = 'online' | 'cash';
-
 export interface IOrderData {
-	payment: TPayment;
-	mail: string;
+	payment: string;
+	email: string;
 	phone: string;
 	address: string;
-	totalPrice: number;
+	total: number;
 	items: string[];
+}
+
+export type FormFieldTypes = 'phone' | 'email' | 'address' | 'payment';
+
+export interface IFormView {
+	errors: string[];
+	isSubmit: boolean;
 }
 
 export interface IFormModel {
 	orderData: IOrderData;
+	errors: string[];
 
-	input(value: string): void;
-	validate(value: string): string | undefined;
+	validate(value: string, type: FormFieldTypes): string[];
 	postOrder(formFields: IOrderData): Promise<object>;
 }

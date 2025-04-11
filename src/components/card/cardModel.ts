@@ -1,25 +1,27 @@
-import { IProductCard, IProductModel } from '../../types/Products';
+import { IProductCardModel } from '../../types/ProductCard';
+import { IProduct } from '../../types/Products';
+import { webLarekApi } from '../api';
+import { EventEmitter } from '../base/events';
 
-export class CardModel implements IProductCard {
-	private _product: IProductModel;
+export class CardModel implements IProductCardModel {
+	private _product: IProduct;
+	private readonly _events: EventEmitter;
 
-	constructor(product: IProductModel) {
-		this._product = product;
+	constructor(events: EventEmitter) {
+		this._events = events;
 	}
 
-	get product(): IProductModel {
+	get product() {
 		return this._product;
 	}
 
-	getCard(url: string): Promise<IProductModel> {
-		this._product = {
-			id: '',
-			category: '',
-			description: '',
-			imageUrl: '',
-			price: 1,
-			title: 'a',
-		};
-		throw new Error('Method not implemented');
+	get events() {
+		return this._events;
+	}
+
+	async getItem(id: string) {
+		const response = await webLarekApi.get(`/product/${id}`);
+		this._product = response as IProduct;
+		return response;
 	}
 }

@@ -1,13 +1,15 @@
+import { IModel } from './base/model';
+
 export interface ICartItem {
 	id: string;
 	price: number;
 	title: string;
 }
 
-export interface ICartModel {
+export interface ICartModel extends IModel {
 	productsList: ICartItem[];
-	totalPrice: number;
+	total: number;
 
-	addItemToCart(id: string): void;
+	addItem(item: ICartItem): void;
 	removeItem(id: string): void;
 }

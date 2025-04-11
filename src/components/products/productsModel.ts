@@ -1,19 +1,32 @@
-import { IProductModel, IProductsList } from '../../types/Products';
+import { IProduct, IProductsListModel } from '../../types/Products';
+import { EventEmitter } from '../base/events';
+import { webLarekApi } from '../api';
 
-export class ProductsModel implements IProductsList {
-	private readonly _products: IProductModel[];
+export class ProductsModel implements IProductsListModel {
+	private _productsList: IProduct[];
 
-	constructor(products: IProductModel[]) {
-		this._products = products;
+	constructor(private readonly _events: EventEmitter) {
+		this.getItems();
 	}
 
-	get products(): IProductModel[] {
-		return this._products;
+	get events() {
+		return this._events;
 	}
 
-	public getItems = (url: string): Promise<object> => {
-		return new Promise((resolve, reject) => {
-			resolve({});
-		});
+	get productsList() {
+		return this._productsList;
+	}
+
+	getItems = async () => {
+		try {
+			const response = await webLarekApi.get('/product/');
+			this._productsList = response as IProduct[];
+			this._events.emit('products:get', this._productsList);
+
+			return this._productsList;
+		} catch (e) {
+			console.error('Error fetching items from API:', e);
+			return [];
+		}
 	};
 }

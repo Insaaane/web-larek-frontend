@@ -1,37 +1,64 @@
-import { IComponent } from '../../types/Components';
+import {
+	IProduct,
+	IProductPreview,
+	IResponseProducts,
+} from '../../types/Products';
+import { Component } from '../base/Component';
+import { EventEmitter } from '../base/events';
+import { CDN_URL } from '../../utils/constants';
 
-export class ProductsView<T> implements IComponent<T> {
-	private readonly _container: HTMLElement;
-	private readonly _model: T;
-	private readonly _template: HTMLElement;
-	private readonly _element: HTMLElement;
+enum Selectors {
+	cardTitle = '.card__title',
+	cardImage = '.card__image',
+	cardCategory = '.card__category',
+	cardPrice = '.card__price',
+}
 
+export class ProductsView extends Component<IResponseProducts> {
 	constructor(
-		container: HTMLElement,
-		model: T,
-		template: HTMLElement,
-		element: HTMLElement
+		parentContainer: HTMLElement,
+		events: EventEmitter,
+		template: HTMLElement
 	) {
-		this._template = template;
-		this._element = element;
-		this._model = model;
-		this._container = container;
+		super(parentContainer, events, template);
 	}
 
-	get element(): HTMLElement {
-		return this._element;
-	}
-	get model(): T {
-		return this._model;
-	}
-	get template(): HTMLElement {
-		return this._template;
-	}
-	get container(): HTMLElement {
-		return this._container;
+	set items(productsList: IProduct[]) {
+		this.parentContainer.innerHTML = '';
+
+		productsList.forEach((item: IProductPreview) => {
+			this.renderProduct(item);
+		});
 	}
 
-	render(data?: object): HTMLElement {
-		throw new Error('Method not implemented.');
+	private handleProductCardClick(id: string) {
+		this._events.emit('card:open', { id: id });
+	}
+
+	renderProduct(productItem: IProductPreview) {
+		const newItem = this._template.cloneNode(true) as HTMLElement;
+
+		this.setText(newItem.querySelector(Selectors.cardTitle), productItem.title);
+
+		this.setImage(
+			newItem.querySelector(Selectors.cardImage),
+			CDN_URL + productItem.image
+		);
+
+		this.setText(
+			newItem.querySelector(Selectors.cardCategory),
+			productItem.category
+		);
+
+		this.setText(
+			newItem.querySelector(Selectors.cardPrice),
+			productItem.price ? `${productItem.price} синапсов` : 'Бесценно'
+		);
+
+		newItem.addEventListener('click', () => {
+			this.handleProductCardClick(productItem.id);
+		});
+
+		this.parentContainer.appendChild(newItem);
 	}
 }

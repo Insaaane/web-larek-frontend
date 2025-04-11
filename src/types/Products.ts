@@ -1,20 +1,23 @@
-export interface IProductModel {
+import { IModel } from './base/model';
+
+export interface IProduct {
 	id: string;
 	title: string;
 	description: string;
-	imageUrl: string;
+	image: string;
 	category: string;
 	price: number | undefined;
 }
 
-export interface IProductCard {
-	product: IProductModel;
+export type IProductPreview = Omit<IProduct, 'description'>;
 
-	getCard(url: string): Promise<IProductModel>;
+export interface IResponseProducts {
+	total: number;
+	items: IProduct[];
 }
 
-export interface IProductsList {
-	products: IProductModel[];
+export interface IProductsListModel extends IModel {
+	productsList: IProduct[];
 
 	getItems(url: string): Promise<object>;
 }
